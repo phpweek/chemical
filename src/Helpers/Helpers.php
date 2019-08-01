@@ -1,5 +1,4 @@
 <?php
-
 if(!defined("CLI")){
     define('CLI', (PHP_SAPI == 'cli') ? true : false);
 }
@@ -165,3 +164,92 @@ if(!function_exists('filterSMILES')){
     }
 }
 
+
+
+if(!function_exists('_26to10')){
+    function _26to10($char)
+    {
+        $chars = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+        $len = strlen($char);
+        $sum = 0;
+        for ($i = 0; $i < $len; $i ++) {
+            $index = array_search($char[$i], $chars);
+            $sum += ($index+1) * pow(26, $len - 1 - $i);
+        }
+        return $sum-1;
+    }
+}
+
+if(!function_exists('_10to26')) {
+    function _10to26($num, $plus = 0)
+    {
+        $chars = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+        $num = intval($num) + $plus + 1;
+        $char = '';
+        do {
+            $key = ($num - 1) % 26;
+            $char = $chars[$key] . $char;
+            $num = floor(($num - $key) / 26);
+        } while ($num > 0);
+        return $char;
+    }
+}
+
+if(!function_exists('_10to26s')) {
+    function _10to26s($num)
+    {
+        return _10to26($num,26);
+    }
+}
+
+
+//bc start
+if(!function_exists('bcround')){
+    function bcround($number, $scale = 0)
+    {
+        if ($scale < 0) $scale = 0;
+        $sign = '';
+        if (bccomp('0', $number, 64) == 1) $sign = '-';
+        $increment = $sign . '0.' . str_repeat('0', $scale) . '5';
+        $number = bcadd($number, $increment, $scale + 1);
+        return bcadd($number, '0', $scale);
+    }
+}
+if(!function_exists('bcplus')) {
+    function bcplus($left_operand, $right_operand, $scale = 0)
+    {
+        return bcround(bcadd($left_operand, $right_operand, $scale + 1), $scale);
+    }
+}
+
+if(!function_exists('bcminus')) {
+    function bcminus($left_operand, $right_operand, $scale = 0)
+    {
+        return bcround(bcsub($left_operand, $right_operand, $scale + 1), $scale);
+    }
+}
+
+if(!function_exists('bcdivide')) {
+    function bcdivide($left_operand, $right_operand, $scale = 0)
+    {
+        return bcround(bcdiv($left_operand, $right_operand, $scale + 1), $scale);
+    }
+}
+
+if(!function_exists('bcmultiply')) {
+    function bcmultiply($left_operand, $right_operand, $scale = 0)
+    {
+        return bcround(bcmul($left_operand, $right_operand, $scale + 1), $scale);
+    }
+}
+//bc end
+
+if(!function_exists('moneyFormat')) {
+    function moneyFormat($money,int $scale=0){
+        $money = bcplus($money,0,$scale+1);
+        $money = bcround($money,$scale);
+        $money_parts = explode('.', $money);
+        $money_parts[0]= strrev(implode(',', str_split(strrev($money_parts[0]), 3)));
+        return implode('.', $money_parts);
+    }
+}

@@ -1,0 +1,29 @@
+{
+    "name": "phpweek/chemical",
+    "description": "PHP chemcial - A  PHP library for chemcials",
+    "keywords": [
+        "PHP", "Chem", "chemcial", "SMILES", "CAS", "MFCD", "MDL", "openbabel"
+    ],
+    "homepage": "http://www.phpweek.com",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "phpweek",
+            "email": "admin@phpweek.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": "^7.1.3"
+    },
+    "autoload": {
+        "classmap": [
+            "src/"
+        ],
+        "files":[
+            "src/Helpers.php"
+        ]
+    }
+}
+

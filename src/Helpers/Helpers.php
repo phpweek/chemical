@@ -43,15 +43,20 @@ if(!function_exists('recursion')) {
      * @param string $children
      * @param int $num
      * @param bool $keyNeed
+     * @param string $callback
      * @return array
      */
-    function recursion(array $arr, $primary_key = 'id', $father_key = 'pid', $children = 'children', $num = 0, $keyNeed = true)
+    function recursion(array $arr, $primary_key = 'id', $father_key = 'pid', $children = 'children', $num = 0, $keyNeed = true,$callback='')
     {
         $list = [];
         foreach ($arr as $val) {
             if ($val[$father_key] == $num) {
-                $tmp = recursion($arr, $primary_key, $father_key, $children, $val[$primary_key], $keyNeed);
+                $tmp = recursion($arr, $primary_key, $father_key, $children, $val[$primary_key], $keyNeed,$callback);
                 $tmp && $val[$children] = $tmp;
+                $val[$children] = $tmp??[];
+                if($callback&&is_callable($callback)){
+                    $val = $callback($val);
+                }
                 if ($keyNeed) {
                     $list[$val[$primary_key]] = $val;
                 } else {
@@ -164,6 +169,18 @@ if(!function_exists('filterSMILES')){
     }
 }
 
+if(!function_exists('smilesToIMG')){
+    function smilesToIMG($SMILES, $filename, $path = "./") {
+        $commond = OBABLE_PATH . " -:\"{$SMILES}\" -O " . $path . $filename . '.png';
+        exec ( $commond, $report );
+        if ($report) {
+            return false;
+        }
+        $commond = OBABLE_PATH . " -:\"{$SMILES}\" -O " . $path . $filename . ".svg";
+        exec ( $commond, $report );
+        return true;
+    }
+}
 
 
 if(!function_exists('_26to10')){
@@ -244,6 +261,7 @@ if(!function_exists('bcmultiply')) {
 }
 //bc end
 
+//money
 if(!function_exists('moneyFormat')) {
     function moneyFormat($money,int $scale=0){
         $money = bcplus($money,0,$scale+1);
@@ -253,3 +271,37 @@ if(!function_exists('moneyFormat')) {
         return implode('.', $money_parts);
     }
 }
+
+
+//seo
+if(!function_exists('urlPushToBaidu')) {
+    /**
+     * 如果没有设置SEO_BAIDU_KEY则返回null
+     * @param array $urls
+     * @param string $type 1.urls新增 2.update更新 3.del 删除
+     * @return array|mixed|null
+     */
+    function urlPushToBaidu($urls = [], $type = 'urls')
+    {
+        if (env('SEO_BAIDU_KEY') && env('SEO_BAIDU_PUSH')) {
+            $api = "http://data.zz.baidu.com/{$type}?site=" . env('APP_URL') . "&token=" . env('SEO_BAIDU_KEY');
+            $ch = curl_init();
+            $options = array(
+                CURLOPT_URL => $api,
+                CURLOPT_POST => true,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POSTFIELDS => implode("\n", $urls),
+                CURLOPT_HTTPHEADER => array('Content-Type: text/plain'),
+            );
+            curl_setopt_array($ch, $options);
+            $result = curl_exec($ch);
+            $result = @json_decode($result, 1);
+            return $result ?? [];
+        }
+        return null;
+    }
+}
+
+
+
+

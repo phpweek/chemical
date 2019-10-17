@@ -17,8 +17,8 @@
     "require": {
         "php": "^7.2",
         "ext-bcmath": "*",
-        "phpoffice/phpword": "v0.17.*",
-        "phpoffice/phpspreadsheet": "v1.9.0"
+        "phpoffice/phpword": "0.17.*",
+        "phpoffice/phpspreadsheet": "1.9.0"
     },
     "autoload": {
         "classmap": [
